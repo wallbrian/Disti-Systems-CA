@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Temperature Control</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+    <h1>Temperature Control</h1>
+    <hr>
+    <form action="/temperature" method="post">
+        <label for="temp">Set temperature:</label>
+        <input type="number" name="temp" id="temp" required>
+        <label for="hours">Set hours:</label>
+        <input type="number" name="hours" id="hours" required>
+        <button type="submit">Set Temperature</button>
+    </form>
+
+    
+    <% if (temperatureInfo) { %>
+        <h2>Temperature Information</h2>
+        <p>Requested Temperature: <%= temperatureInfo.requestedTemp %> °C</p>
+        <p>Duration: <%= temperatureInfo.requestedHours %> hours</p>
+        <p>Current Temperature: <%= temperatureInfo.currentTemp %> °C</p> <!-- Unable to get this to start at 20, keeps throwing undefined errors so leaving blank -->
+    <% } %>
+
+    <a href="/">Return to main menu</a>
+
+</body>
+</html>

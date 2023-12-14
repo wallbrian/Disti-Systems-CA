@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Local Attractions</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+    <h1>Local Attractions</h1>
+    <hr>
+
+    <p>Get to know the area fast - our top rated local attractions!</p>
+
+    <!-- Publishes Server-Client gRPC info listed in app.js getLocalAttracions function -->
+
+    <% localAttractions.topAttractions.forEach(function(attraction) { %>
+        <p><b><%= attraction.attractionName %></b> - Rated <%= attraction.attractionRating %> out of 10</p>
+    <% }); %>
+
+    <hr>
+
+    <!-- Unary gRPC -->
+
+    <form action="/localAttractions/distance" method="get"> <!-- Unary gRPC -->
+      <label for="distanceToTravel">How far would you like to travel (up to 10km)?</label>
+      <div style="display: flex; align-items: center;">
+
+         <!-- Originally had enter number, too similar to reserved page, swapped for range slider: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/range -->
+         <!-- oninput sets the distanceToTravel number which is picked up by var distanceToTravel in the localAttractions route -->
+         
+          <input type="range" name="distanceToTravel" min="0" max="10" value="10" oninput="rangeValue.innerText = this.value + 'km'">
+          <p id="rangeValue" style="margin-left: 10px;"></p>
+      </div>
+      <button type="submit">Go!</button>
+  </form>
+
+    <!-- The above distanceToTravel value is then inputted into the attractions call, info sent back to view and displayed via the below -->
+    <% localAttractions.distanceAttractions.forEach(function(attraction) { %>
+        <p><b>The <%= attraction.attractionName %></b> is only <%= attraction.distance %>kms away.</p>
+    <% }); %>
+
+    <hr>
+    <a href="/">Return to the main menu</a>
+</body>
+</html>

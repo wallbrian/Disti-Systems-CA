@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package smartHotel;
+
+service BookingService {
+    rpc reserve(BookRequest) returns (BookResponse) {}
+}
+
+message BookRequest {
+    string reserveRoom = 1;
+    int32 numOfNights = 2;
+}
+
+message BookResponse {
+    string confirm = 1;
+    string message = 2;
+}
+
+service roomAvailabilityService {
+    rpc getRoomAvailability(availabilityRequest) returns (stream availabilityResponse) {}
+}
+
+message availabilityRequest {
+        }
+
+    message availabilityResponse {
+        string roomType = 1;
+        uint32 roomQuantity = 2;
+    }
+
+service localAttractionsService {
+    rpc getLocalAttractions(AttractionsRequest) returns (stream AttractionsResponse) {}
+}
+
+    message AttractionsRequest {
+    }
+
+    message AttractionsResponse {
+        string attractionName = 1;
+        uint32 attractionRating = 2;
+    }
+
+service distance {
+    rpc getDistance(DistanceRequest) returns (stream DistanceResponse) {}
+}
+
+    message DistanceRequest {
+        int32 distanceToTravel = 1;
+    }
+
+    message DistanceResponse {
+        string attractionName = 1;
+        uint32 attractionRating = 2;
+        uint32 distance = 3;
+    }
+
+service tempControl {
+    rpc setTemp(stream tempControlRequest) returns (tempControlResponse) {}
+}
+
+message tempControlRequest {
+    double temp = 1;
+    uint32 hours = 2;
+}
+
+message tempControlResponse {
+    double temp = 1;
+    uint32 hours = 2;
+}

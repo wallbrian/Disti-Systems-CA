@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Reservation</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1> Welcome to Reservations - APP TEST TESTER FILE</h1><hr>
+
+    Rooms available<hr> <!-- Server-client gRPC -->
+
+    <% roomAvailability.forEach(function(room) { %>
+      <p><b><%= room.roomType %></b> - <%= room.roomQuantity %> available</p> <!-- Publishes room info from server app.js getRoomAvailability function -->
+    <% }); %>
+
+    <hr>
+
+    <form action="/reserve" method="get"> <!-- Unary gRPC -->
+      <label for="reserveRoom">Reserve Room</label>
+      <select name="reserveRoom">
+        <option value="yes">Yes</option> <!-- Guest provided with two options-->
+        <option value="no">No</option>
+      </select>
+      <br/>
+      <label for="numOfNights">Number of Nights</label>
+      <input type="number" name="numOfNights" min="1"> <!-- Guest needs to request a minimum of 1 night-->
+      <button type="submit">Reserve!</button> <!-- Submits info to server -->
+    </form>
+
+    <% if(confirm !== null) { %>
+      <p><b>Reservation confirmed:</b> <%= confirm %></p> <!-- Confirmed if guest selects Yes and a valid number -->
+    <% } %>
+
+    <% if(confirm == null) { %>
+      <p><b>No reservation confirmed - reason:</b> <%= error %></p> <!-- All other options should return an error -->
+    <% } %> 
+
+   <a href="/">Return to main menu</a>
+
+  </body>
+</html>

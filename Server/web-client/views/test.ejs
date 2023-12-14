@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Local Attractions</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1>Local Attractions</h1><hr>
+
+    <p>Get to know the area fast with our local attracions:</p>
+
+    <% roomAvailability.forEach(function(room) { %>
+      <p><b><%= room.roomType %></b> - <%= room.roomQuantity %> available</p>
+    <% }); %>
+    
+    <hr>
+    <a href="/">Return to main menu</a>
+  </body>
+</html>
