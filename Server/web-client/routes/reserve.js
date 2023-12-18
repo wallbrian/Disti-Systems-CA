@@ -28,6 +28,7 @@ router.get('/', async (req, res, next) => {
       call.on('end', resolve);
     });
 
+
     // room availability section ends here
 
     await grpcLoad;

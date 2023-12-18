@@ -1,35 +1,50 @@
+var readline = require('readline');
 var readlineSync = require('readline-sync');
 var grpc = require("@grpc/grpc-js");
 var protoLoader = require("@grpc/proto-loader");
+const { normalize } = require('path');
 
 var PROTO_PATH = __dirname + "/protos/smartHotel.proto";
 var packageDefinition = protoLoader.loadSync(PROTO_PATH);
 var smartHotel = grpc.loadPackageDefinition(packageDefinition).smartHotel;
 
-var reserveRoom = readlineSync.question("Do you want to book a room? If so, say Yes: ");
-var numOfNights = readlineSync.question("How many nights would you like to stay? ");
+var client = new smartHotel.HotelChat('localhost:40000', grpc.credentials.createInsecure());
 
-var request = {
-    reserveRoom: reserveRoom,
-    numOfNights: parseInt(numOfNights)
-};
+var name = readlineSync.question("What is your name? ")
+var call = client.sendMessage();
 
-if (isNaN(request.numOfNights) || request.numOfNights <= 0) {
-    console.log("Please enter a valid number of nights greater than 0.");
+call.on('data', function(resp) {
+    console.log(resp.name + ": " + resp.message)
+});
+call.on('end', function(){
+});
 
-} else {
-    var client = new smartHotel.BookingService("0.0.0.0:40000", grpc.credentials.createInsecure());
+call.on("error", function(e) {
+    console.log("Cannot connect to chat server")
+})
 
+call.write({
+    message: name + " joined the chatroom",
+    name:name
+});
 
-client.reserve(request, function (error, response) {
-    if (error) {
-        console.error("Error:", error);
+var rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+rl.on("line", function(message) {
+    if (message.toLowerCase() ==="quit") {
+        call.write({
+            message: name + " left the server",
+            name: name
+        });
+        call.end();
+        rl.close();
     } else {
-        if (response.confirm !== undefined) {
-            console.log(response.confirm);
-        } else {
-            console.error("Unexpected response format:", response);
-        }
+        call.write({
+            message: message,
+            name: name
+        });
     }
 });
-}

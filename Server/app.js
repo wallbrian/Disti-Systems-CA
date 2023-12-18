@@ -152,11 +152,20 @@ function getDistance(call, callback) {
     call.end()
 }
 
+// Server-client gRPC
+
+function getRoomTempInitial(call) {
+    
+    var initialTemp = 20;
+    call.write({initialTemp: initialTemp})
+    call.end();
+}
+
 // Client-Server gRPC
 
 function setTemp(call, callback) {
 
-    var currentTemp = 20
+    var currentTemp = 0
     var requestedTemp = 0
     var requestedHours = 0
 
@@ -179,19 +188,46 @@ function setTemp(call, callback) {
 
 }
 
+// bidirectional chat
 
+var clients = {}
+
+function sendMessage(call) {
+    call.on('data', function(chat_message) {
+
+        if(!(chat_message.name in clients)) {
+            clients[chat_message.name] = {
+                name: chat_message.name,
+                call: call
+            }
+        }
+
+        for (var client in clients) {
+            clients[client].call.write(
+                {
+                    name: chat_message.name,
+                    message: chat_message.message
+                }
+            )
+        }
+    });
+
+}
 
 var server = new grpc.Server();
 
 server.addService(smartHotel_proto.BookingService.service, { reserve: reserve }); // Reserve room Unary gRPC
 server.addService(smartHotel_proto.roomAvailabilityService.service, { getRoomAvailability: getRoomAvailability }); // Room type Server-Client gRPC
 
-server.addService(smartHotel_proto.localAttractionsService.service, { getLocalAttractions: getLocalAttractions }); // Local attracirons Server-Client gRPC
+server.addService(smartHotel_proto.localAttractionsService.service, { getLocalAttractions: getLocalAttractions }); // Local attractions Server-Client gRPC
 server.addService(smartHotel_proto.distance.service, { getDistance: getDistance }); // Distance room Unary gRPC
 
 server.addService(smartHotel_proto.tempControl.service, { setTemp: setTemp }); // Temperature Control Client-Server gRPC
+server.addService(smartHotel_proto.getRoomTempInitialService.service, { getRoomTempInitial: getRoomTempInitial }); // Room type Server-Client gRPC
+
+server.addService(smartHotel_proto.HotelChat.service, { sendMessage: sendMessage }) // Chat bi-directional gRPC
 
 server.bindAsync("0.0.0.0:40000", grpc.ServerCredentials.createInsecure(), function () {
-    console.log("Server started on port 3080");
+    console.log("Server started on port 40000");
     server.start();
 });
