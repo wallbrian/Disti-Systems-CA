@@ -68,17 +68,6 @@ message tempControlResponse {
     uint32 hours = 2;
 }
 
-service getRoomTempInitialService {
-    rpc getRoomTempInitial(roomTempIntialRequest) returns (stream roomTempIntialResponse) {}
-}
-
-message roomTempIntialRequest {
-        }
-
-    message roomTempIntialResponse {
-        uint32 initialTemp = 1;
-    }
-
 service HotelChat {
     rpc sendMessage(stream ChatMessage) returns (stream ChatMessage) {}
 }

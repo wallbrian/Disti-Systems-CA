@@ -5,7 +5,7 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
 </head>
 <body>
-    <h1>Temperature Control</h1>
+    <h1>Set your temperature</h1>
     <hr>
     <form action="/temperature" method="post">
         <label for="temp">Set temperature:</label>
@@ -15,13 +15,13 @@
         <button type="submit">Set Temperature</button>
     </form>
 
-    
+    <!-- Client-Server gRPC -->
 
     <% if (temperatureInfo) { %>
         <h2>Temperature Information</h2>
-        <p>Requested Temperature: <%= temperatureInfo.requestedTemp %> °C</p>
-        <p>Duration: <%= temperatureInfo.requestedHours %> hours</p>
-        <p>Current Temperature: <%= temperatureInfo.currentTemp %> °C</p> <!-- Unable to get this to start at 20, keeps throwing undefined errors so leaving blank -->
+        <p>Requested Temperature: <%= temperatureInfo.requestedTemp %> °C</p> <!-- Displays guests requested temperature -->
+        <p>Duration: <%= temperatureInfo.requestedHours %> hours</p> <!-- Displays guests requested duration in hours -->
+        <p>Temperature set to: <%= temperatureInfo.currentTemp %> °C</p> <!-- Initially set to 20, keeps whatever guest sets it to -->
     <% } %>
 
     

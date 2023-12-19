@@ -35,18 +35,18 @@ router.get('/', async (req, res, next) => {
 
     // reserve room section section starts here
     
-    if (reserveRoom === 'yes' && (numOfNights === '' || isNaN(numOfNights) || parseInt(numOfNights) <= 0)) { // creating error codes for every non-confirmed possibility (I can simplify this by making it only if 'Want to reserve' = Yes && Nights = !NaN is confirmed but then cannot differentiate error messages)
-      res.render('reserve', { title: 'Reservation Status', error: 'Please enter a valid number of nights', confirm: null });
+    if (reserveRoom === 'yes' && (numOfNights === '' || isNaN(numOfNights) || parseInt(numOfNights) <= 0)) {
+      res.render('reserve', { title: 'Reservation Status', error: 'Please enter a valid number of nights', confirm: null, roomAvailability });  // Error if 'Yes' but no number of nights inputted
     } else if (reserveRoom === 'no' && (numOfNights === '' || isNaN(numOfNights) || parseInt(numOfNights) <= 0)) {
-      res.render('reserve', { title: 'Reservation Status', error: 'You selected "No," and you left the number of nights blank', confirm: null });
+      res.render('reserve', { title: 'Reservation Status', error: 'You selected "No," and you left the number of nights blank', confirm: null, roomAvailability }); // Error if guest selects "No" & no number of nights inputted
     } else if (reserveRoom === 'no' && (numOfNights !== '' && !isNaN(numOfNights))) {
-      res.render('reserve', { title: 'Reservation Status', error: "You selected 'No,' so you're not staying", confirm: null });
+      res.render('reserve', { title: 'Reservation Status', error: "You selected 'No,' so you're not staying", confirm: null, roomAvailability }); // Error if guest selects "No" and inputs a number of nights.
     } else if (!isNaN(numOfNights)) {
       try {
         client.reserve({ reserveRoom: reserveRoom, numOfNights: parseInt(numOfNights) }, function (error, response) {
           if (error) {
             console.error("Error:", error);
-            res.render('reserve', { title: 'Reservation Status', error: "Error communicating with the server", confirm: null });
+            res.render('reserve', { title: 'Reservation Status', error: "Error communicating with the server", confirm: null, roomAvailability });
           } else {
             if (response.confirm !== undefined) {
               res.render('reserve', { title: 'Reservation Status', error: null, confirm: response.confirm, roomAvailability });
@@ -61,22 +61,12 @@ router.get('/', async (req, res, next) => {
         res.render('reserve', { title: 'Reservation Status', error: "An error occurred on the client side", confirm: null, roomAvailability });
       }
     } else {
-      res.render('reserve', { title: 'Reservation Status', error: "Please enter a valid number of nights", confirm: null, roomAvailability });
+      res.render('reserve', { title: 'Reservation Status', error: "Awaiting guest input", confirm: null, roomAvailability }); // Default error reason when guest logs onto reservations
     }
   } catch (error) {
     console.error(error);
     res.status(500).send('Error communicating with the server');
   }
-  
-    // reserve room section section ends here
-
-    var grpcLoad2 = new Promise((resolve) => { // another promise/resolve in case gRPC loading too fast
-      call.on('end', resolve);
-    });
-
-    // room availability section ends here
-
-    await grpcLoad2;
 
 });
 

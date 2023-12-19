@@ -1,36 +1,37 @@
 var grpc = require("@grpc/grpc-js");
 var protoLoader = require("@grpc/proto-loader");
-var PROTO_PATH = __dirname + "/protos/smartHotel.proto";
+var PROTO_PATH = __dirname + "/protos/smartHotel.proto"; // Loads protocol buffer file
 var packageDefinition = protoLoader.loadSync(PROTO_PATH);
 var smartHotel_proto = grpc.loadPackageDefinition(packageDefinition).smartHotel;
 
 // Unary gRPC
 
 function reserve(call, callback) {
+    console.log("--- Reservation Received ---");
     try {
         var reserveRoom = call.request.reserveRoom;
         var numOfNights = parseInt(call.request.numOfNights);
 
-        if (reserveRoom && reserveRoom.trim().toLowerCase() === "yes" && !isNaN(numOfNights)) {
+        if (reserveRoom && reserveRoom.trim().toLowerCase() === "yes" && !isNaN(numOfNights)) { // Checks that room reservation is valid based on a "Yes" selected + a valid number.
             var confirm = "Congratulations, you have reserved a room for " + numOfNights + " nights."
             console.log("Guest has booked a room for " +numOfNights +" nights.")
-            callback(null, {
+            callback(null, { // If valid, respond with confirm message.
                 message: undefined,
                 confirm: confirm
             });
         } else {
-            var errorMessage;
+            var errorMessage; // Generates an error 
             if (isNaN(numOfNights) || numOfNights <= 0) {
                 errorMessage = "Please enter a valid number of nights greater than 0.";
             } else {
                 errorMessage = "You will not reserve a room with us.";
             }
-            callback(null, {
+            callback(null, { // Respond with error message
                 message: errorMessage
             });
         }
     } catch (e) {
-        var errorMessage = "An error has occurred: " + e.message
+        var errorMessage = "An error has occurred: " + e.message // Handles errors
         console.error(errorMessage);
         callback(null, {
             message: errorMessage
@@ -42,7 +43,7 @@ function reserve(call, callback) {
 
 function getRoomAvailability(call) {
     
-    var data = [
+    var data = [ // Sample array of rooms available to client - published on reserve page
         { roomType: "Single", 
         roomQuantity: 1 
         },
@@ -54,18 +55,18 @@ function getRoomAvailability(call) {
         }
     ];
 
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < data.length; i++) { // Send room info to client
         call.write({
             roomType: data[i].roomType,
             roomQuantity: data[i].roomQuantity
         });
     }
-    call.end();
+    call.end(); // Closes the call
 }
 
 // Server-client gRPC
 
-function getLocalAttractions(call, callback) {
+function getLocalAttractions(call, callback) { // Array of 3 rated attractions
 
     var data = [
         {
@@ -82,22 +83,22 @@ function getLocalAttractions(call, callback) {
         }
     ]
 
-    for(var i = 0; i < data.length; i++){
+    for(var i = 0; i < data.length; i++){ // Sends top 3 attractions to client
         call.write({
             attractionName: data[i].attractionName,
             attractionRating: data[i].attractionRating,
         })
     }
-    call.end()
+    call.end() // Closes call
 }
 
 // Unary gRPC 
 
-function getDistance(call, callback) {
+function getDistance(call, callback) { 
 
-    console.log("Received getDistance request");
+    console.log("--- getDistance request received ---");
    
-    var data = [
+    var data = [ // Array of available attractions within 10km
         {
         attractionName:"Museum",
         distance: 2
@@ -140,7 +141,7 @@ function getDistance(call, callback) {
     
     console.log("A guest requested what attractions were within", distanceToTravel +" km.");
 
-    for(var i = 0; i < data.length; i++){
+    for(var i = 0; i < data.length; i++){ // Sends attractions to client within specified distance by stoping the loop at the number inputted.
         if (data[i].distance <= distanceToTravel) {
         call.write({
             attractionName: data[i].attractionName,
@@ -149,17 +150,10 @@ function getDistance(call, callback) {
         })
         }
     }
-    call.end()
+    call.end() // Close call
 }
 
-// Server-client gRPC
 
-function getRoomTempInitial(call) {
-    
-    var initialTemp = 20;
-    call.write({initialTemp: initialTemp})
-    call.end();
-}
 
 // Client-Server gRPC
 
@@ -169,41 +163,44 @@ function setTemp(call, callback) {
     var requestedTemp = 0
     var requestedHours = 0
 
-    call.on('data', function(request) {
+    call.on('data', function(request) { // Listens for temperature + duration request from client
         requestedTemp = request.temp
         currentTemp = requestedTemp
         requestedHours = request.hours
+
+        console.log("A guest requested to set the temperature to", requestedTemp +"°C for " +requestedHours + " hours."); // Prints request to server console.
     })
 
-    call.on("end", function() {
+    call.on("end", function() { // Used to set the HTML to show response was received.
         callback(null, {
             temp: requestedTemp,
             hours: requestedHours
         })
     })
 
-    call.on('error', function(e) {
+    call.on('error', function(e) { // Error handling
         console.log("An error occured")
     })
 
+    
 }
 
 // bidirectional chat
 
-var clients = {}
+var guests = {} // Array to hold all clients that joint the chat
 
 function sendMessage(call) {
     call.on('data', function(chat_message) {
 
-        if(!(chat_message.name in clients)) {
-            clients[chat_message.name] = {
+        if(!(chat_message.name in guests)) {
+            guests[chat_message.name] = { // Register guest in the chat 
                 name: chat_message.name,
                 call: call
             }
         }
 
-        for (var client in clients) {
-            clients[client].call.write(
+        for (var guest in guests) { // Send chat message to all in chat
+            guests[guest].call.write(
                 {
                     name: chat_message.name,
                     message: chat_message.message
@@ -214,7 +211,9 @@ function sendMessage(call) {
 
 }
 
-var server = new grpc.Server();
+var server = new grpc.Server(); // Creates gRPC server
+
+// Adds services to server
 
 server.addService(smartHotel_proto.BookingService.service, { reserve: reserve }); // Reserve room Unary gRPC
 server.addService(smartHotel_proto.roomAvailabilityService.service, { getRoomAvailability: getRoomAvailability }); // Room type Server-Client gRPC
@@ -223,11 +222,10 @@ server.addService(smartHotel_proto.localAttractionsService.service, { getLocalAt
 server.addService(smartHotel_proto.distance.service, { getDistance: getDistance }); // Distance room Unary gRPC
 
 server.addService(smartHotel_proto.tempControl.service, { setTemp: setTemp }); // Temperature Control Client-Server gRPC
-server.addService(smartHotel_proto.getRoomTempInitialService.service, { getRoomTempInitial: getRoomTempInitial }); // Room type Server-Client gRPC
 
 server.addService(smartHotel_proto.HotelChat.service, { sendMessage: sendMessage }) // Chat bi-directional gRPC
 
 server.bindAsync("0.0.0.0:40000", grpc.ServerCredentials.createInsecure(), function () {
-    console.log("Server started on port 40000");
+    console.log("Smart Hotel server is up & running!");
     server.start();
 });
