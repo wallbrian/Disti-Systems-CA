@@ -148,7 +148,7 @@ function getDistance(call, callback) {
             attractionRating: data[i].attractionRating,
             distance: data[i].distance
         })
-        }
+        }  
     }
     call.end() // Close call
 }
