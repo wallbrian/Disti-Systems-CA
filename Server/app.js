@@ -45,20 +45,20 @@ function getRoomAvailability(call) {
     
     var data = [ // Sample array of rooms available to client - published on reserve page
         { roomType: "Single", 
-        roomQuantity: 1 
+        roomDesc: "Our single occupancy in a classic double bedded room, inclusive of full Irish breakfast. These rooms are smaller than our standard rooms with limited views."
         },
         { roomType: "Double", 
-        roomQuantity: 6 
+        roomDesc: "The standard double occupancy bed room, with full ensuite facilities, iron and ironing board, mini safe and hairdryer."
         },
         { roomType: "Junior Suite", 
-        roomQuantity: 2 
+        roomDesc: "Our Junior Suite comes with a Kingsize bed and stunning lake view with the following amenities;with full ensuite facilities and iron and ironing board."
         }
     ];
 
     for (var i = 0; i < data.length; i++) { // Send room info to client
         call.write({
             roomType: data[i].roomType,
-            roomQuantity: data[i].roomQuantity
+            roomDesc: data[i].roomDesc
         });
     }
     call.end(); // Closes the call
@@ -71,7 +71,7 @@ function getLocalAttractions(call, callback) { // Array of 3 rated attractions
     var data = [
         {
         attractionName:"Museum",
-        attractionRating: 7,
+        attractionRating: 10,
         },
         {
         attractionName:"Beach",
@@ -79,7 +79,7 @@ function getLocalAttractions(call, callback) { // Array of 3 rated attractions
         },
         {
         attractionName:"Art Gallery",
-        attractionRating: 6
+        attractionRating: 8
         }
     ]
 

@@ -25,7 +25,7 @@ message availabilityRequest {
 
     message availabilityResponse {
         string roomType = 1;
-        uint32 roomQuantity = 2;
+        string roomDesc = 2;
     }
 
 service localAttractionsService {

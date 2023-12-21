@@ -3,20 +3,80 @@
 <head>
     <title>Local Attractions</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <style>
+        .button {
+          background-color: #FFFFFF; 
+          border: none;
+          color: white;
+          padding: 8px 32px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          border-radius: 4px;
+          font-size: 16px;
+          margin: 4px 2px;
+          transition-duration: 0.4s;
+          cursor: pointer;
+        }
+        
+        .button.active,
+        .button:active,
+        .button.active:hover,
+        .button:active:hover {
+        background-color: #008CBA;
+        color: white;
+        }
+
+        .button {
+          background-color: white; 
+          color: black; 
+          border: 2px solid #008CBA;
+        }
+        
+        .button:hover {
+          background-color: #008CBA;
+          color: white;
+        }
+
+        h1 span {
+          color: #008CBA;
+        }
+
+        </style>
 </head>
 <body>
-    <h1>See our local attractions</h1>
-    <hr>
+    
+    <h1><center><span>SmartHotel :: </span>See our local attractions<span> ::</span></center></h1>
 
-    <p>Get to know the area fast - our top rated local attractions!</p>
+    <hr>
+    <center>
+    <a href ="/"><button class="button">Home</button></a>
+    <a href="/reserve"><button class="button">Reserve</button></a>
+    <a href="/localAttractions"><button class="button" id="localAttractionsButton">Local Attractions</button></a>
+    <a href="/temperature"><button class="button">Temperature</button></a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var temperatureButton = document.getElementById('localAttractionsButton');
+            if (window.location.pathname === '/localAttractions') {
+                temperatureButton.classList.add('active');
+            }
+        });
+    </script>
+
+    </center>
+    <hr>
+    Get to know the area fast with our top rated local attractions!<hr>
 
     <!-- Publishes Server-Client gRPC info listed in app.js getLocalAttracions function -->
-
-    <% localAttractions.topAttractions.forEach(function(attraction) { %>
-        <p><b><%= attraction.attractionName %></b> - Rated <%= attraction.attractionRating %> out of 10</p>
-    <% }); %>
-
-    <hr>
+    <% for (var i = 0; i < localAttractions.topAttractions.length; i++) {
+      var attraction = localAttractions.topAttractions[i];
+  %>
+    <p><b><%= attraction.attractionName %></b> rated <%= attraction.attractionRating %> / 10</p>
+  <%
+    }
+  %>
+  <hr>
 
     <!-- Unary gRPC -->
 
@@ -34,11 +94,14 @@
   </form>
 
     <!-- The above distanceToTravel value is then inputted into the attractions call, info sent back to view and displayed via the below -->
-    <% localAttractions.distanceAttractions.forEach(function(attraction) { %>
+    <%
+    for (var i = 0; i < localAttractions.distanceAttractions.length; i++) {
+        var attraction = localAttractions.distanceAttractions[i];
+    %>
         <p><b>The <%= attraction.attractionName %></b> is only <%= attraction.distance %>kms away.</p>
-    <% }); %>
-
-    <hr>
-    <a href="/">Return to the main menu</a>
+    <%
+    }
+    %>
+   
 </body>
 </html>

@@ -3,15 +3,83 @@
   <head>
     <title>Reservation</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
+
+    <style>
+      .button {
+        background-color: #FFFFFF; 
+        border: none;
+        color: white;
+        padding: 8px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        border-radius: 4px;
+        font-size: 16px;
+        margin: 4px 2px;
+        transition-duration: 0.4s;
+        cursor: pointer;
+      }
+      
+      .button {
+        background-color: white; 
+        color: black; 
+        border: 2px solid #008CBA;
+      }
+
+      .button.active,
+      .button:active,
+      .button.active:hover,
+      .button:active:hover {
+      background-color: #008CBA;
+      color: white;
+      }
+      
+      .button:hover {
+          background-color: #008CBA;
+          color: white;
+        }
+
+        h1 span {
+          color: #008CBA;
+        }
+
+        </style>
+</head>
   <body>
-    <h1> Make your Reservation</h1><hr>
+    
+    <h1><center><span>SmartHotel :: </span>Make your reservation<span> ::</span></center></h1>
 
-    Rooms available<hr> <!-- Server-client gRPC -->
+    <hr>
+    <center>
+    <a href ="/"><button class="button">Home</button></a>
+    <a href="/reserve"><button class="button" id="reserveButton">Reserve</button></a>
+    <a href="/localAttractions"><button class="button">Local Attractions</button></a>
+    <a href="/temperature"><button class="button">Temperature</button></a>
 
-    <% roomAvailability.forEach(function(room) { %>
-      <p><b><%= room.roomType %></b> - <%= room.roomQuantity %> available</p> <!-- Publishes room info from server app.js getRoomAvailability function -->
-    <% }); %>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var temperatureButton = document.getElementById('reserveButton');
+        if (window.location.pathname === '/reserve') {
+            temperatureButton.classList.add('active');
+        }
+    });
+</script>
+
+
+    </center>
+    <hr>
+
+
+    Please see a description of our room types below.<hr> <!-- Server-client gRPC -->
+    <p></p>
+    <% for (var i = 0; i < roomAvailability.length; i++) {
+      var room = roomAvailability[i];
+     %>
+    <p><b><%= room.roomType %></b> - <%= room.roomDesc %></p>
+  <%
+    }
+  %>
+  <hr>
 
     <hr>
 
@@ -28,15 +96,12 @@
     </form>
 
     <% if(confirm !== null) { %>
-      <p><b>Reservation confirmed:</b> <%= confirm %></p> <!-- Confirmed if guest selects Yes and a valid number -->
+      <p style="color: green;"><b>Reservation confirmed:</b> <%= confirm %></p> <!-- Confirmed if guest selects Yes and a valid number -->
     <% } %>
 
     <% if(confirm == null) { %>
-      <p><b>No reservation confirmed - reason:</b> <%= error %></p> <!-- All other options should return an error -->
+      <p style="color: red;"><b>No reservation confirmed - reason:</b> <%= error %></p> <!-- All other options should return an error -->
     <% } %> 
-      
-
-   <a href="/">Return to main menu</a>
 
   </body>
 </html>
